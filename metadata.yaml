@@ -1,19 +1,22 @@
 # Copyright 2021 guoqiao
 # See LICENSE file for licensing details.
 name: k8s-pihole
-description: |
-  TEMPLATE-TODO: fill out the charm's description
+
 summary: |
-  TEMPLATE-TODO: fill out the charm's summary
+  Charmed Kubernetes Operator to deploy and manage Pi-hole in a Kubernetes cluster.
 
-# TEMPLATE-TODO: replace with containers for your workload (delete for non-k8s)
+description: |
+  Pi-hole is a DNS sinkhole that protects your devices from unwanted content,
+  without installing any client-side software.
+  This Charm manages Pi-hole in Kubernetes cluster.
+  Powered by Charmed Operator Framework.
+
 containers:
-  httpbin:
-    resource: httpbin-image
+  pihole:
+    resource: pihole-image
 
-# TEMPLATE-TODO: each container defined above must specify an oci-image resource
 resources:
-  httpbin-image:
+  pihole-image:
     type: oci-image
-    description: OCI image for httpbin (kennethreitz/httpbin)
+    description: OCI image for pihole (https://hub.docker.com/r/pihole/pihole)
 
