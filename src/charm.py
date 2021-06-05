@@ -46,6 +46,9 @@ class K8SPiholeCharm(CharmBase):
         """
         # Get a reference the container attribute on the PebbleReadyEvent
         container = event.workload
+        env = {}
+        if self.config["webpassword"]:
+            env["WEBPASSWORD"] = self.config["webpassword"]
         # Define an initial Pebble layer configuration
         pebble_layer = {
             "summary": "pihole layer",
@@ -56,7 +59,7 @@ class K8SPiholeCharm(CharmBase):
                     "summary": "pihole",
                     "command": "/s6-init bash",
                     "startup": "enabled",
-                    "environment": {"thing": self.model.config["thing"]},
+                    "environment": env,
                 }
             },
         }
