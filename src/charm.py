@@ -22,7 +22,7 @@ from ops.model import ActiveStatus
 logger = logging.getLogger(__name__)
 
 
-class K8SPiholeCharm(CharmBase):
+class PiholeCharm(CharmBase):
     """Charm the service."""
 
     _stored = StoredState()
@@ -104,4 +104,4 @@ class K8SPiholeCharm(CharmBase):
 
 
 if __name__ == "__main__":
-    main(K8SPiholeCharm)
+    main(PiholeCharm)

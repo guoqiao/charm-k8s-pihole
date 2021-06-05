@@ -6,14 +6,14 @@
 import unittest
 from unittest.mock import Mock
 
-from charm import K8SPiholeCharm
+from charm import PiholeCharm
 from ops.model import ActiveStatus
 from ops.testing import Harness
 
 
 class TestCharm(unittest.TestCase):
     def setUp(self):
-        self.harness = Harness(K8SPiholeCharm)
+        self.harness = Harness(PiholeCharm)
         self.addCleanup(self.harness.cleanup)
         self.harness.begin()
 
