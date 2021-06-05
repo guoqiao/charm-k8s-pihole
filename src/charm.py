@@ -30,7 +30,6 @@ class PiholeCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.framework.observe(self.on.pihole_pebble_ready, self._on_pihole_pebble_ready)
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.show_webpassword_action, self._on_show_webpassword_action)
         self._stored.set_default(webpassword="")
@@ -41,23 +40,12 @@ class PiholeCharm(CharmBase):
             "service-port": 8080,
         })
 
-    def _on_pihole_pebble_ready(self, event):
-        """Define and start a workload using the Pebble API.
-
-        TEMPLATE-TODO: change this example to suit your needs.
-        You'll need to specify the right entrypoint and environment
-        configuration for your specific workload. Tip: you can see the
-        standard entrypoint of an existing container using docker inspect
-
-        Learn more about Pebble layers at https://github.com/canonical/pebble
-        """
-        # Get a reference the container attribute on the PebbleReadyEvent
-        container = event.workload
+    def _pihole_pebble_layer(self):
         env = {}
         if self.config["webpassword"]:
             env["WEBPASSWORD"] = self.config["webpassword"]
         # Define an initial Pebble layer configuration
-        pebble_layer = {
+        return {
             "summary": "pihole layer",
             "description": "pebble config layer for pihole",
             "services": {
@@ -68,14 +56,19 @@ class PiholeCharm(CharmBase):
                     "startup": "enabled",
                     "environment": env,
                 }
-            },
+            }
         }
+
+    def _restart_pihole(self, container):
+        pebble_layer = self._pihole_pebble_layer()
         # Add intial Pebble config layer using the Pebble API
         container.add_layer("pihole", pebble_layer, combine=True)
-        # Autostart any services that were defined with startup: enabled
-        container.autostart()
-        # Learn more about statuses in the SDK docs:
-        # https://juju.is/docs/sdk/constructs#heading--statuses
+        service = container.get_service("pihole")
+        if service.is_running():
+            logger.debug("stopping service")
+            container.stop("pihole")
+        logger.debug("starting service")
+        container.start("pihole")
         self.unit.status = ActiveStatus()
 
     def _on_config_changed(self, _):
@@ -92,6 +85,8 @@ class PiholeCharm(CharmBase):
         if webpassword != self._stored.webpassword:
             logger.debug("webpassword udpated")
             self._stored.webpassword = webpassword
+        container = self.unit.get_container("pihole")
+        self._restart_pihole(container)
 
     def _on_show_webpassword_action(self, event):
         """Just an example to show how to receive actions.
