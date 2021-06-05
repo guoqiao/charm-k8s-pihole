@@ -35,8 +35,8 @@ class PiholeCharm(CharmBase):
         self._stored.set_default(webpassword="")
 
         self.ingress = IngressRequires(self, {
-            "service-hostname": "pihole",
-            "service-name": "pihole",
+            "service-hostname": "{}.juju".format(self.app.name),
+            "service-name": self.app.name,
             "service-port": 8080,
         })
 
