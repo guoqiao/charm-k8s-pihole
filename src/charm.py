@@ -89,20 +89,8 @@ class PiholeCharm(CharmBase):
         self._restart_pihole(container)
 
     def _on_show_webpassword_action(self, event):
-        """Just an example to show how to receive actions.
-
-        TEMPLATE-TODO: change this example to suit your needs.
-        If you don't need to handle actions, you can remove this method,
-        the hook created in __init__.py for it, the corresponding test,
-        and the actions.py file.
-
-        Learn more about actions at https://juju.is/docs/sdk/actions
-        """
-        fail = event.params["fail"]
-        if fail:
-            event.fail(fail)
-        else:
-            event.set_results({"fortune": "A bug in the code is worth two in the documentation."})
+        """show current webpassword."""
+        event.set_results({"show-webpassword": self._stored.webpassword or ""})
 
 
 if __name__ == "__main__":
