@@ -33,3 +33,7 @@ storage:
   etc_dnsmasq:
     type: filesystem
     location: /srv/etc/dnsmasq.d/
+
+requires:
+  ingress:
+    interface: ingress
