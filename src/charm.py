@@ -32,7 +32,7 @@ class PiholeCharm(CharmBase):
         super().__init__(*args)
         self.framework.observe(self.on.pihole_pebble_ready, self._on_pihole_pebble_ready)
         self.framework.observe(self.on.config_changed, self._on_config_changed)
-        self.framework.observe(self.on.fortune_action, self._on_fortune_action)
+        self.framework.observe(self.on.show_webpassword_action, self._on_show_webpassword_action)
         self._stored.set_default(webpassword="")
 
         self.ingress = IngressRequires(self, {
@@ -93,7 +93,7 @@ class PiholeCharm(CharmBase):
             logger.debug("found a new thing: %r", current)
             self._stored.things.append(current)
 
-    def _on_fortune_action(self, event):
+    def _on_show_webpassword_action(self, event):
         """Just an example to show how to receive actions.
 
         TEMPLATE-TODO: change this example to suit your needs.
