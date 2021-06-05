@@ -14,6 +14,7 @@ develop a new k8s charm using the Operator Framework:
 
 import logging
 
+from charms.nginx_ingress_integrator.v0.ingress import IngressRequires
 from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
@@ -33,6 +34,12 @@ class PiholeCharm(CharmBase):
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.fortune_action, self._on_fortune_action)
         self._stored.set_default(things=[])
+
+        self.ingress = IngressRequires(self, {
+            "service-hostname": "pihole",
+            "service-name": "pihole",
+            "service-port": 8080,
+        })
 
     def _on_pihole_pebble_ready(self, event):
         """Define and start a workload using the Pebble API.
