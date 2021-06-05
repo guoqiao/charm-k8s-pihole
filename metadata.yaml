@@ -15,9 +15,9 @@ containers:
   pihole:
     resource: pihole-image
     mounts:
-      - storage: etc_pihole
+      - storage: etc-pihole
         location: /etc/pihole/
-      - storage: etc_dnsmasq
+      - storage: etc-dnsmasq
         location: /etc/dnsmasq.d/
 
 resources:
@@ -27,10 +27,10 @@ resources:
 
 
 storage:
-  etc_pihole:
+  etc-pihole:
     type: filesystem
     location: /srv/etc/pihole/
-  etc_dnsmasq:
+  etc-dnsmasq:
     type: filesystem
     location: /srv/etc/dnsmasq.d/
 
