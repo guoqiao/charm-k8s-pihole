@@ -1,12 +1,19 @@
-# k8s-pihole
+# charm-k8s-pihole
 
 ## Description
 
-TODO: Describe your charm in a few paragraphs of Markdown
+Pi-hole is a DNS sinkhole that protects your devices from unwanted content,
+without installing any client-side software.
+This Charm manages Pi-hole in Kubernetes cluster.
+Powered by Charmed Operator Framework.
 
 ## Usage
 
-TODO: Provide high-level usage, such as required config or relations
+
+    charmcraft build
+    juju deploy ./pihole.charm pihole --resource pihole-image=pihole/pihole:latest
+    juju deploy nginx-ingress-integrator ingress
+    juju relate ingress pihole
 
 
 ## Developing
