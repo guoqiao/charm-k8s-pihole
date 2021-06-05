@@ -33,7 +33,7 @@ class PiholeCharm(CharmBase):
         self.framework.observe(self.on.pihole_pebble_ready, self._on_pihole_pebble_ready)
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.fortune_action, self._on_fortune_action)
-        self._stored.set_default(things=[])
+        self._stored.set_default(webpassword="")
 
         self.ingress = IngressRequires(self, {
             "service-hostname": "pihole",
