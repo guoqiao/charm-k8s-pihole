@@ -88,10 +88,10 @@ class PiholeCharm(CharmBase):
 
         Learn more about config at https://juju.is/docs/sdk/config
         """
-        current = self.config["thing"]
-        if current not in self._stored.things:
-            logger.debug("found a new thing: %r", current)
-            self._stored.things.append(current)
+        webpassword = self.config["webpassword"]
+        if webpassword != self._stored.webpassword:
+            logger.debug("webpassword udpated")
+            self._stored.webpassword = webpassword
 
     def _on_show_webpassword_action(self, event):
         """Just an example to show how to receive actions.
