@@ -54,7 +54,7 @@ class K8SPiholeCharm(CharmBase):
                 "pihole": {
                     "override": "replace",
                     "summary": "pihole",
-                    "command": "gunicorn -b 0.0.0.0:80 pihole:app -k gevent",
+                    "command": "/s6-init bash",
                     "startup": "enabled",
                     "environment": {"thing": self.model.config["thing"]},
                 }
