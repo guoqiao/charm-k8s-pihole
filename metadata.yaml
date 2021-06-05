@@ -14,9 +14,22 @@ description: |
 containers:
   pihole:
     resource: pihole-image
+    mounts:
+      - storage: etc_pihole
+        location: /etc/pihole/
+      - storage: etc_dnsmasq
+        location: /etc/dnsmasq.d/
 
 resources:
   pihole-image:
     type: oci-image
     description: OCI image for pihole (https://hub.docker.com/r/pihole/pihole)
 
+
+storage:
+  etc_pihole:
+    type: filesystem
+    location: /srv/etc/pihole/
+  etc_dnsmasq:
+    type: filesystem
+    location: /srv/etc/dnsmasq.d/
