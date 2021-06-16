@@ -30,15 +30,27 @@ class PiholeCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
+        self.framework.observe(self.on.install, self.on_install)
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.show_webpassword_action, self._on_show_webpassword_action)
         self._stored.set_default(webpassword="")
 
         self.ingress = IngressRequires(self, {
-            "service-hostname": "{}.juju".format(self.app.name),
+            "service-hostname": self.external_hostname,
             "service-name": self.app.name,
-            "service-port": 8080,
+            "service-port": self.service_port,
         })
+
+    @property
+    def external_hostname(self):
+        return self.config["external-hostname"] or self.app.name
+
+    @property
+    def service_port(self):
+        return self.config["service-port"]
+
+    def on_install(self, event):
+        pass
 
     def _pihole_pebble_layer(self):
         env = {}
