@@ -31,7 +31,7 @@ class PiholeCharm(CharmBase):
     def __init__(self, *args):
         super().__init__(*args)
         self.framework.observe(self.on.install, self.on_install)
-        self.framework.observe(self.on.config_changed, self._on_config_changed)
+        self.framework.observe(self.on.config_changed, self.on_config_changed)
         self.framework.observe(self.on.show_webpassword_action, self._on_show_webpassword_action)
         self._stored.set_default(webpassword="")
 
@@ -83,7 +83,7 @@ class PiholeCharm(CharmBase):
         container.start("pihole")
         self.unit.status = ActiveStatus()
 
-    def _on_config_changed(self, _):
+    def on_config_changed(self, _):
         """Just an example to show how to deal with changed configuration.
 
         TEMPLATE-TODO: change this example to suit your needs.
