@@ -13,6 +13,7 @@ develop a new k8s charm using the Operator Framework:
 """
 
 import logging
+import subprocess
 
 from charms.nginx_ingress_integrator.v0.ingress import IngressRequires
 from ops.charm import CharmBase
@@ -32,7 +33,7 @@ class PiholeCharm(CharmBase):
         super().__init__(*args)
         self.framework.observe(self.on.install, self.on_install)
         self.framework.observe(self.on.config_changed, self.on_config_changed)
-        self.framework.observe(self.on.show_webpassword_action, self._on_show_webpassword_action)
+        self.framework.observe(self.on.restartdns_action, self.on_restartdns_action)
         self._stored.set_default(webpassword="")
 
         self.ingress = IngressRequires(self, {
@@ -83,6 +84,9 @@ class PiholeCharm(CharmBase):
         container.start("pihole")
         self.unit.status = ActiveStatus()
 
+    def change_webpassword(self, new_password):
+        return subprocess.check_call(["pihole", "-a", "-p", new_password])
+
     def on_config_changed(self, _):
         """Just an example to show how to deal with changed configuration.
 
@@ -95,14 +99,16 @@ class PiholeCharm(CharmBase):
         """
         webpassword = self.config["webpassword"]
         if webpassword != self._stored.webpassword:
-            logger.debug("webpassword udpated")
+            logger.debug("webpassword updated")
             self._stored.webpassword = webpassword
+            self.change_webpassword(webpassword)
         container = self.unit.get_container("pihole")
         self._restart_pihole(container)
 
-    def _on_show_webpassword_action(self, event):
-        """show current webpassword."""
-        event.set_results({"show-webpassword": self._stored.webpassword or ""})
+    def on_restartdns_action(self, event):
+        """restartdns in pihole."""
+        output = subprocess.check_output(["pihole", "restartdns"]).decode("utf8")
+        event.set_results({"restartdns": output})
 
 
 if __name__ == "__main__":

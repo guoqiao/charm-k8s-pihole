@@ -7,5 +7,5 @@
 #
 # Learn more about actions at: https://juju.is/docs/sdk/actions
 
-show-webpassword:
-  description: show webpassword
+restartdns:
+  description: restart dns serveice in pihole
