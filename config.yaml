@@ -1,13 +1,18 @@
 # Copyright 2021 guoqiao
 # See LICENSE file for licensing details.
-#
-# TEMPLATE-TODO: change this example to suit your needs.
-# If you don't need a config, you can remove the file entirely.
-# It ties in to the example _on_config_changed handler in src/charm.py
-#
 # Learn more about config at: https://juju.is/docs/sdk/config
 
 options:
+  external-hostname:
+    default: ""
+    description: >
+      The external hostname thsi application should be available on. If unset, it will default to the deployed
+      application name in the model.
+    type: string
+  service-port:
+    default: 8080
+    description: on which port will naginx ingress expose the web ui.
+    type: int
   webpassword:
     default: ""
     description: set a secure password for pihole web or it will be random
