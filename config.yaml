@@ -14,6 +14,6 @@ options:
     description: on which port will naginx ingress expose the web ui.
     type: int
   webpassword:
-    default: ""
-    description: set a secure password for pihole web or it will be random
+    default: "pihole"
+    description: set a secure password for pihole web, it will be random if blank.
     type: string
