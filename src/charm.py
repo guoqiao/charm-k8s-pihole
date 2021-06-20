@@ -15,7 +15,7 @@ develop a new k8s charm using the Operator Framework:
 import logging
 import subprocess
 
-from charms.nginx_ingress_integrator.v0.ingress import IngressRequires
+from charms.ingress.v0.ingress import IngressRequires
 from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
