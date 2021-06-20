@@ -24,6 +24,10 @@ Create and activate a virtualenv with the development requirements:
     source venv/bin/activate
     pip install -r requirements-dev.txt
 
+To update the ingress library:
+
+    charmcraft fetch-lib charms.ingress.v0.ingress
+
 ## Testing
 
 The Python operator framework includes a very nice harness for testing
