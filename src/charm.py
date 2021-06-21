@@ -67,7 +67,7 @@ class PiholeCharm(CharmBase):
                 "pihole": {
                     "override": "replace",
                     "summary": "pihole",
-                    "command": "/s6-init bash",
+                    "command": "/s6-init",
                     "startup": "enabled",
                     "environment": env,
                 }
