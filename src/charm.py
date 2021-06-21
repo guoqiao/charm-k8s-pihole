@@ -93,12 +93,7 @@ class PiholeCharm(CharmBase):
         return subprocess.check_call(["pihole", "-a", "-p", new_password])
 
     def on_config_changed(self, _):
-        """Just an example to show how to deal with changed configuration.
-
-        TEMPLATE-TODO: change this example to suit your needs.
-        If you don't need to handle config, you can remove this method,
-        the hook created in __init__.py for it, the corresponding test,
-        and the config.py file.
+        """config change hook.
 
         Learn more about config at https://juju.is/docs/sdk/config
         """
