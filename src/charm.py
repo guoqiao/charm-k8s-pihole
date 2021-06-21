@@ -39,23 +39,16 @@ class PiholeCharm(CharmBase):
         self._stored.set_default(webpassword="")
 
         self.ingress = IngressRequires(self, {
-            "service-hostname": self.external_hostname,
+            "service-hostname": self.config["external-hostname"] or self.app.name,
             "service-name": self.app.name,
-            "service-port": self.service_port,
+            "service-port": self.config["service-port"],
         })
 
     @property
     def container(self):
         return self.unit.get_container(self.name)
 
-    @property
-    def service_port(self):
-        return self.config["service-port"]
-
-    def on_install(self, event):
-        pass
-
-    def _pihole_pebble_layer(self):
+    def get_pihole_pebble_layer(self):
         env = {}
         if self.config["webpassword"]:
             env["WEBPASSWORD"] = self.config["webpassword"]
