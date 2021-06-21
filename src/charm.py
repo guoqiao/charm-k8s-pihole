@@ -69,8 +69,8 @@ class PiholeCharm(CharmBase):
             }
         }
 
-    def _restart_pihole(self, container):
-        pebble_layer = self._pihole_pebble_layer()
+    def restart_pihole(self, container):
+        pebble_layer = self.get_pihole_pebble_layer()
         # Add intial Pebble config layer using the Pebble API
         container.add_layer("pihole", pebble_layer, combine=True)
         service = container.get_service("pihole")
@@ -108,7 +108,7 @@ class PiholeCharm(CharmBase):
             self._stored.webpassword = webpassword
             self.change_webpassword(webpassword)
         container = self.unit.get_container("pihole")
-        self._restart_pihole(container)
+        self.restart_pihole(container)
 
     def on_restartdns_action(self, event):
         """restartdns in pihole."""
