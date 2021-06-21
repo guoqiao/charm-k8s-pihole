@@ -32,7 +32,8 @@ class PiholeCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.framework.observe(self.on.install, self.on_install)
+        #  self.framework.observe(self.on.install, self.on_install)
+        self.framework.observe(self.on.pihole_pebble_ready, self.on_pihole_pebble_ready)
         self.framework.observe(self.on.config_changed, self.on_config_changed)
         self.framework.observe(self.on.restartdns_action, self.on_restartdns_action)
         self.framework.observe(self.on.getplan_action, self.on_getplan_action)
@@ -77,6 +78,14 @@ class PiholeCharm(CharmBase):
             container.stop("pihole")
         logger.debug("starting service")
         container.start("pihole")
+        self.unit.status = ActiveStatus()
+
+    def on_pihole_pebble_ready(self, event):
+        container = event.workload
+        plan = container.get_plan()
+        if not plan.services:
+            container.add_layer("pihole", self.get_pihole_pebble_layer(), combine=True)
+            container.autostart()
         self.unit.status = ActiveStatus()
 
     def change_webpassword(self, new_password):
