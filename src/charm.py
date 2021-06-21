@@ -47,6 +47,7 @@ class PiholeCharm(CharmBase):
 
     @property
     def container(self):
+        """get app container for current unit."""
         return self.unit.get_container(self.name)
 
     def get_pihole_pebble_layer(self):
