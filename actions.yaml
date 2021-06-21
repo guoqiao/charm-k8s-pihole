@@ -9,3 +9,6 @@
 
 restartdns:
   description: restart dns serveice in pihole
+
+getplan:
+  description: get combined pebble plan

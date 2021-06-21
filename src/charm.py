@@ -11,7 +11,7 @@ develop a new k8s charm using the Operator Framework:
 
     https://discourse.charmhub.io/t/4208
 """
-
+import json
 import logging
 import subprocess
 
@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 class PiholeCharm(CharmBase):
     """Charm the service."""
 
+    name = "pihole"
     _stored = StoredState()
 
     def __init__(self, *args):
@@ -34,6 +35,7 @@ class PiholeCharm(CharmBase):
         self.framework.observe(self.on.install, self.on_install)
         self.framework.observe(self.on.config_changed, self.on_config_changed)
         self.framework.observe(self.on.restartdns_action, self.on_restartdns_action)
+        self.framework.observe(self.on.getplan_action, self.on_getplan_action)
         self._stored.set_default(webpassword="")
 
         self.ingress = IngressRequires(self, {
@@ -43,8 +45,8 @@ class PiholeCharm(CharmBase):
         })
 
     @property
-    def external_hostname(self):
-        return self.config["external-hostname"] or self.app.name
+    def container(self):
+        return self.unit.get_container(self.name)
 
     @property
     def service_port(self):
@@ -109,6 +111,12 @@ class PiholeCharm(CharmBase):
         """restartdns in pihole."""
         output = subprocess.check_output(["pihole", "restartdns"]).decode("utf8")
         event.set_results({"restartdns": output})
+
+    def on_getplan_action(self, event):
+        """get pebble plan in pihole unit."""
+        plan = self.container.get_plan()
+        output = json.dumps(plan.to_dict(), indent=4) if plan else ""
+        event.set_results({"plan": output})
 
 
 if __name__ == "__main__":
