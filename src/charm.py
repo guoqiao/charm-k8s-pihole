@@ -97,6 +97,7 @@ class PiholeCharm(CharmBase):
 
         Learn more about config at https://juju.is/docs/sdk/config
         """
+        self.ingress.update_config({"service-hostname": self.config["external-hostname"]})
         webpassword = self.config["webpassword"]
         if webpassword != self._stored.webpassword:
             logger.debug("webpassword updated")
