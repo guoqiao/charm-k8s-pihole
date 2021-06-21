@@ -10,7 +10,7 @@ options:
       application name in the model.
     type: string
   service-port:
-    default: 8080
+    default: 80
     description: on which port will naginx ingress expose the web ui.
     type: int
   webpassword:
