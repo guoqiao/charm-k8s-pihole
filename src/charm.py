@@ -160,10 +160,7 @@ class PiholeCharm(CharmBase):
         ref: https://juju.is/docs/sdk/config
         """
         self.ingress.update_config({"service-hostname": self.config["external-hostname"]})
-        if self.is_running():
-            self.change_webpassword(self.config["webpassword"])
-        else:
-            logger.warning("config changed but pihole service is not running")
+        self.change_webpassword(self.config["webpassword"])
 
     def on_restartdns_action(self, event):
         """restartdns in pihole."""
