@@ -14,8 +14,10 @@ develop a new k8s charm using the Operator Framework:
 import json
 import logging
 import subprocess
+import uuid
 
 from charms.ingress.v0.ingress import IngressRequires
+import ops
 from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
@@ -48,7 +50,21 @@ class PiholeCharm(CharmBase):
     @property
     def container(self):
         """get app container for current unit."""
-        return self.unit.get_container(self.name)
+        try:
+            return self.unit.get_container(self.name)
+        except ops.model.ModelError:
+            return None
+
+    @property
+    def service(self):
+        try:
+            return self.container.get_service(self.name)
+        except ops.model.ModelError:
+            return None
+
+    def is_running(self):
+
+        return self.service.is_running() if self.service else False
 
     def get_pihole_pebble_layer(self):
         env = {}
