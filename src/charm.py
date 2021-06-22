@@ -144,21 +144,20 @@ class PiholeCharm(CharmBase):
             logger.warning("new password is empty, no change made")
 
     def on_config_changed(self, _):
-        """config change hook.
+        """charm config changed hook.
 
-        Learn more about config at https://juju.is/docs/sdk/config
+        Notes:
+        - config-changed may run before pebble-ready
+        - multiple config values may be changed at one time
+        - config can not be changed from within the charm code
+
+        ref: https://juju.is/docs/sdk/config
         """
         self.ingress.update_config({"service-hostname": self.config["external-hostname"]})
         if self.is_running():
-            webpassword = self.config["webpassword"]
-            if webpassword != self._stored.webpassword:
-                logger.debug("webpassword updated")
-                self._stored.webpassword = webpassword
-                self.change_webpassword(webpassword)
-            # container = self.unit.get_container("pihole")
-            # self.restart_pihole(container)
+            self.change_webpassword(self.config["webpassword"])
         else:
-            logger.warning("pihole service is not running")
+            logger.warning("config changed but pihole service is not running")
 
     def on_restartdns_action(self, event):
         """restartdns in pihole."""
