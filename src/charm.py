@@ -116,7 +116,6 @@ class PiholeCharm(CharmBase):
         try:
             self.container.start(label)
         except ops.pebble.ChangeError as exc:
-            summary = exc.change.summary
             #  Start service "cmd" (cannot start service: exited quickly with code 0)
             if "exited quickly with code 0" in exc.err:
                 logger.info("cmd succeed: %s", cmd)
