@@ -61,10 +61,12 @@ class PiholeCharm(CharmBase):
             return self.container.get_service(self.name)
         except ops.model.ModelError:
             return None
+        except ops.pebble.ConnectionError:
+            return None
 
     def is_running(self):
         """Check pihole service is running."""
-        return self.service.is_running() if self.service else False
+        return self.service and self.service.is_running()
 
     def get_pihole_pebble_layer(self):
         env = {}
