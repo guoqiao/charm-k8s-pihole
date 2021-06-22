@@ -115,9 +115,15 @@ class PiholeCharm(CharmBase):
 
         try:
             self.container.start(label)
-        except ops.pebble.ChangeError:
+        except ops.pebble.ChangeError as exc:
+            summary = exc.change.summary
             #  Start service "cmd" (cannot start service: exited quickly with code 0)
-            logger.exception("expected cmd layer exception")
+            if "exited quickly with code 0" in exc.err:
+                logger.info("cmd succeed: %s", cmd)
+                return True
+            else:
+                logger.exception("cmd failed")
+                return False
 
     def on_pihole_pebble_ready(self, event):
         container = event.workload
