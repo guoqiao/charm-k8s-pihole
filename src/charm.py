@@ -93,20 +93,48 @@ class PiholeCharm(CharmBase):
         if service.is_running():
             logger.debug("stopping service")
             container.stop("pihole")
+        else:
+            logger.debug("service is not running")
         logger.debug("starting service")
         container.start("pihole")
         self.unit.status = ActiveStatus()
+
+    def run_cmd(self, cmd, label="cmd", env=None):
+        layer = {
+            "services": {
+                label: {
+                    "override": "replace",
+                    "startup": "disabled",
+                    "command": cmd,
+                    "environment": env or {},
+                }
+            }
+        }
+        logger.info("running cmd: %s", cmd)
+        self.container.add_layer(label, layer, combine=True)
+
+        try:
+            self.container.start(label)
+        except ops.pebble.ChangeError:
+            #  Start service "cmd" (cannot start service: exited quickly with code 0)
+            logger.exception("expected cmd layer exception")
 
     def on_pihole_pebble_ready(self, event):
         container = event.workload
         plan = container.get_plan()
         if not plan.services:
             container.add_layer("pihole", self.get_pihole_pebble_layer(), combine=True)
+            logger.info("pihole layer added")
             container.autostart()
+            self.change_webpassword(self.config["webpassword"])
         self.unit.status = ActiveStatus()
 
     def change_webpassword(self, new_password):
-        return subprocess.check_call(["pihole", "-a", "-p", new_password])
+        if new_password:
+            cmd = "/usr/local/bin/pihole -a -p {}".format(new_password)
+            self.run_cmd(cmd)
+        else:
+            logger.warning("new password is empty, no change made")
 
     def on_config_changed(self, _):
         """config change hook.
@@ -114,13 +142,16 @@ class PiholeCharm(CharmBase):
         Learn more about config at https://juju.is/docs/sdk/config
         """
         self.ingress.update_config({"service-hostname": self.config["external-hostname"]})
-        webpassword = self.config["webpassword"]
-        if webpassword != self._stored.webpassword:
-            logger.debug("webpassword updated")
-            self._stored.webpassword = webpassword
-            self.change_webpassword(webpassword)
-        container = self.unit.get_container("pihole")
-        self.restart_pihole(container)
+        if self.is_running():
+            webpassword = self.config["webpassword"]
+            if webpassword != self._stored.webpassword:
+                logger.debug("webpassword updated")
+                self._stored.webpassword = webpassword
+                self.change_webpassword(webpassword)
+            # container = self.unit.get_container("pihole")
+            # self.restart_pihole(container)
+        else:
+            logger.warning("pihole service is not running")
 
     def on_restartdns_action(self, event):
         """restartdns in pihole."""
