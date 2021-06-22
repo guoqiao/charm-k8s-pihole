@@ -13,8 +13,6 @@ develop a new k8s charm using the Operator Framework:
 """
 import json
 import logging
-import subprocess
-import uuid
 
 from charms.ingress.v0.ingress import IngressRequires
 import ops
