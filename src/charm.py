@@ -145,6 +145,7 @@ class PiholeCharm(CharmBase):
         if new_password:
             cmd = "/usr/local/bin/pihole -a -p {}".format(new_password)
             self.run_cmd(cmd)
+            self._stored.webpassword = new_password
         else:
             logger.warning("new password is empty, no change made")
 
