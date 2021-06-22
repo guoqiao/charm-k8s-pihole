@@ -99,6 +99,16 @@ class PiholeCharm(CharmBase):
         container.start("pihole")
         self.unit.status = ActiveStatus()
 
+    def on_pihole_pebble_ready(self, event):
+        container = event.workload
+        plan = container.get_plan()
+        if not plan.services:
+            container.add_layer("pihole", self.get_pihole_pebble_layer(), combine=True)
+            logger.info("pihole layer added")
+            container.autostart()
+            self.change_webpassword(self.config["webpassword"])
+        self.unit.status = ActiveStatus()
+
     def run_cmd(self, cmd, label="cmd", env=None):
         layer = {
             "services": {
@@ -123,16 +133,6 @@ class PiholeCharm(CharmBase):
             else:
                 logger.exception("cmd failed")
                 return False
-
-    def on_pihole_pebble_ready(self, event):
-        container = event.workload
-        plan = container.get_plan()
-        if not plan.services:
-            container.add_layer("pihole", self.get_pihole_pebble_layer(), combine=True)
-            logger.info("pihole layer added")
-            container.autostart()
-            self.change_webpassword(self.config["webpassword"])
-        self.unit.status = ActiveStatus()
 
     def change_webpassword(self, new_password):
         if new_password:
