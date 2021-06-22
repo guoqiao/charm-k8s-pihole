@@ -18,22 +18,17 @@ class TestCharm(unittest.TestCase):
         self.harness.begin()
 
     def test_config_changed(self):
-        self.assertEqual(list(self.harness.charm._stored.things), [])
-        self.harness.update_config({"thing": "foo"})
-        self.assertEqual(list(self.harness.charm._stored.things), ["foo"])
+        self.assertEqual(self.harness.charm._stored.webpassword, "")
+        self.harness.update_config({"webpassword": "foo"})
+        self.assertEqual(self.harness.charm._stored.webpassword, "foo")
 
     def test_action(self):
         # the harness doesn't (yet!) help much with actions themselves
         action_event = Mock(params={"fail": ""})
-        self.harness.charm._on_fortune_action(action_event)
+        self.harness.charm.run_cmd = Mock(return_value=True)
+        self.harness.charm.on_restartdns_action(action_event)
 
         self.assertTrue(action_event.set_results.called)
-
-    def test_action_fail(self):
-        action_event = Mock(params={"fail": "fail this"})
-        self.harness.charm._on_fortune_action(action_event)
-
-        self.assertEqual(action_event.fail.call_args, [("fail this",)])
 
     def test_pihole_pebble_ready(self):
         # Check the initial Pebble plan is empty
@@ -42,12 +37,17 @@ class TestCharm(unittest.TestCase):
         # Expected plan after Pebble ready with default config
         expected_plan = {
             "services": {
+                "cmd": {
+                    "override": "replace",
+                    "command": "/usr/local/bin/pihole -a -p pihole",
+                    "startup": "disabled",
+                },
                 "pihole": {
                     "override": "replace",
                     "summary": "pihole",
-                    "command": "gunicorn -b 0.0.0.0:80 pihole:app -k gevent",
+                    "command": "/s6-init",
                     "startup": "enabled",
-                    "environment": {"thing": "🎁"},
+                    "environment": {"WEBPASSWORD": "pihole"},
                 }
             },
         }
