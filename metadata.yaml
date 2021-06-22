@@ -1,6 +1,10 @@
 # Copyright 2021 guoqiao
 # See LICENSE file for licensing details.
+# spec: https://discourse.charmhub.io/t/charm-metadata-v2/3674
+
 name: pihole
+
+maintainer: Joe Guo <joe.guo@canonical.com>
 
 summary: |
   Charmed Kubernetes Operator to deploy and manage Pi-hole in a Kubernetes cluster.
@@ -8,17 +12,33 @@ summary: |
 description: |
   Pi-hole is a DNS sinkhole that protects your devices from unwanted content,
   without installing any client-side software.
-  This Charm manages Pi-hole in Kubernetes cluster.
+  This Charm manages Pi-hole in Kubernetes cluster, such as MicroK8s.
   Powered by Charmed Operator Framework.
+
+docs: https://discourse.charmhub.io/t/pi-hole-kubernetes-operator-charm-docs/4763
+
+tags:
+  - network
+  - dns
 
 containers:
   pihole:
     resource: pihole-image
     mounts:
       - storage: etc-pihole
+        # path in app container
         location: /etc/pihole/
       - storage: etc-dnsmasq
+        # path in app container
         location: /etc/dnsmasq.d/
+    # NA feature
+    # ports:
+      # - containerPort: 53
+        # protocol: TCP
+      # - containerPort: 53
+        # protocol: UDP
+      # - containerPort: 67
+        # protocol: UDP
 
 resources:
   pihole-image:
@@ -29,11 +49,18 @@ resources:
 storage:
   etc-pihole:
     type: filesystem
-    location: /srv/etc/pihole/
+    # path in charm container
+    # default: /var/lib/juju/storage/<name>/<num>
+    location: /etc/pihole/
   etc-dnsmasq:
     type: filesystem
-    location: /srv/etc/dnsmasq.d/
+    # path in charm container
+    # default: /var/lib/juju/storage/<name>/<num>
+    location: /etc/dnsmasq.d/
 
 requires:
+  # charmcraft fetch-lib charms.ingress.v0.ingress
+  # juju deploy nginx-ingress-integrator ingress
+  # juju relate ingress pihole
   ingress:
     interface: ingress
