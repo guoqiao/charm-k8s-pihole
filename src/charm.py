@@ -63,7 +63,7 @@ class PiholeCharm(CharmBase):
             return None
 
     def is_running(self):
-
+        """Check pihole service is running."""
         return self.service.is_running() if self.service else False
 
     def get_pihole_pebble_layer(self):
@@ -112,6 +112,11 @@ class PiholeCharm(CharmBase):
         self.unit.status = ActiveStatus()
 
     def run_cmd(self, cmd, label="cmd", env=None):
+        """Run a one-off cmd.
+
+        Currently pebble can only run long-live daemon service.
+        This function workaround it by checking exception message.
+        """
         layer = {
             "services": {
                 label: {
