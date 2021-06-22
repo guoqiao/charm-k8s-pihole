@@ -86,10 +86,12 @@ class PiholeCharm(CharmBase):
         }
 
     def restart_pihole(self, container):
+        """ensure pihole service is restarted."""
         pebble_layer = self.get_pihole_pebble_layer()
         # Add intial Pebble config layer using the Pebble API
         container.add_layer("pihole", pebble_layer, combine=True)
         service = container.get_service("pihole")
+        # TODO: this is not working properly
         if service.is_running():
             logger.debug("stopping service")
             container.stop("pihole")
