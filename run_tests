@@ -12,6 +12,6 @@ else
     export PYTHONPATH="lib:src:$PYTHONPATH"
 fi
 
-flake8
+flake8 --extend-exclude lib/
 coverage run --source=src -m unittest -v "$@"
 coverage report -m
