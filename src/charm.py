@@ -149,7 +149,7 @@ class PiholeCharm(CharmBase):
         else:
             logger.warning("new password is empty, no change made")
 
-    def on_config_changed(self, _):
+    def on_config_changed(self, event):
         """charm config changed hook.
 
         Notes:
@@ -161,6 +161,14 @@ class PiholeCharm(CharmBase):
         """
         self.ingress.update_config({"service-hostname": self.config["external-hostname"]})
         self.change_webpassword(self.config["webpassword"])
+        layer = self.get_pihole_pebble_layer()
+        try:
+            services = self.container.get_plan().to_dict().get("services", {})
+        except ConnectionError:
+            event.defer()
+            return
+        if services != layer["services"]:
+            self.restart_pihole(self.container)
 
     def on_restartdns_action(self, event):
         """restartdns in pihole."""
