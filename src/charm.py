@@ -19,7 +19,7 @@ import ops
 from ops.charm import CharmBase
 from ops.framework import StoredState
 from ops.main import main
-from ops.model import ActiveStatus
+from ops.model import ActiveStatus, MaintenanceStatus
 
 logger = logging.getLogger(__name__)
 
@@ -87,18 +87,16 @@ class PiholeCharm(CharmBase):
 
     def restart_pihole(self, container):
         """ensure pihole service is restarted."""
+
+        self.unit.status = MaintenanceStatus("restarting pihole service")
         pebble_layer = self.get_pihole_pebble_layer()
         # Add intial Pebble config layer using the Pebble API
         container.add_layer("pihole", pebble_layer, combine=True)
         service = container.get_service("pihole")
-        # TODO: this is not working properly
-        if service.is_running():
-            logger.debug("stopping service")
-            container.stop("pihole")
-        else:
+        if not service.is_running():
             logger.debug("service is not running")
-        logger.debug("starting service")
-        container.start("pihole")
+            logger.debug("starting service")
+            container.start("pihole")
         self.unit.status = ActiveStatus()
 
     def on_pihole_pebble_ready(self, event):
