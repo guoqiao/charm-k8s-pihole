@@ -142,12 +142,17 @@ class PiholeCharm(CharmBase):
                 return False
 
     def change_webpassword(self, new_password):
-        if new_password:
-            cmd = "/usr/local/bin/pihole -a -p {}".format(new_password)
-            self.run_cmd(cmd)
-            self._stored.webpassword = new_password
-        else:
+        if not new_password:
             logger.warning("new password is empty, no change made")
+            return
+
+        if self._stored.webpassword == new_password:
+            logger.warning("new password is same as current one, no change made")
+            return
+
+        cmd = "/usr/local/bin/pihole -a -p {}".format(new_password)
+        self.run_cmd(cmd)
+        self._stored.webpassword = new_password
 
     def on_config_changed(self, event):
         """charm config changed hook.
