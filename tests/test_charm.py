@@ -30,6 +30,14 @@ class TestCharm(unittest.TestCase):
 
         self.assertTrue(action_event.set_results.called)
 
+    def test_action_failed(self):
+        # the harness doesn't (yet!) help much with actions themselves
+        action_event = Mock(params={"fail": ""})
+        self.harness.charm.run_cmd = Mock(return_value=False)
+        self.harness.charm.on_restartdns_action(action_event)
+
+        self.assertTrue(action_event.fail.called)
+
     def test_pihole_pebble_ready(self):
         # Check the initial Pebble plan is empty
         initial_plan = self.harness.get_container_pebble_plan("pihole")
