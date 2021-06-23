@@ -101,12 +101,14 @@ class PiholeCharm(CharmBase):
 
     def on_pihole_pebble_ready(self, event):
         container = event.workload
-        plan = container.get_plan()
-        if not plan.services:
-            container.add_layer("pihole", self.get_pihole_pebble_layer(), combine=True)
-            logger.info("pihole layer added")
+        container.add_layer("pihole", self.get_pihole_pebble_layer(), combine=True)
+        logger.info("pihole layer added")
+        try:
             container.autostart()
-            self.change_webpassword(self.config["webpassword"])
+        except ops.pebble.ChangeError as exc:
+            # Start service "pihole" (service "pihole" was previously started)
+            logger.warning(exc.err)
+        self.change_webpassword(self.config["webpassword"])
         self.unit.status = ActiveStatus()
 
     def run_cmd(self, cmd, label="cmd", env=None):
