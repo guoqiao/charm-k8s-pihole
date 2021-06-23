@@ -167,7 +167,7 @@ class PiholeCharm(CharmBase):
         layer = self.get_pihole_pebble_layer()
         try:
             services = self.container.get_plan().to_dict().get("services", {})
-        except ConnectionError:
+        except ops.pebble.ConnectionError:
             event.defer()
             return
 
