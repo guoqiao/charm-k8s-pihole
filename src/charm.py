@@ -164,16 +164,18 @@ class PiholeCharm(CharmBase):
 
         ref: https://juju.is/docs/sdk/config
         """
-        self.ingress.update_config({"service-hostname": self.config["external-hostname"]})
-        self.change_webpassword(self.config["webpassword"])
         layer = self.get_pihole_pebble_layer()
         try:
             services = self.container.get_plan().to_dict().get("services", {})
         except ConnectionError:
             event.defer()
             return
+
         if services != layer["services"]:
             self.restart_pihole(self.container)
+
+        self.ingress.update_config({"service-hostname": self.config["external-hostname"]})
+        self.change_webpassword(self.config["webpassword"])
 
     def on_restartdns_action(self, event):
         """restartdns in pihole."""
