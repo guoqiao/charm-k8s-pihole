@@ -173,8 +173,11 @@ class PiholeCharm(CharmBase):
     def on_restartdns_action(self, event):
         """restartdns in pihole."""
         cmd = "/usr/local/bin/pihole restartdns"
-        ret = self.run_cmd(cmd)
-        event.set_results({"restartdns": "succeed" if ret else "failed"})
+        event.log("running cmd: {}".format(cmd))
+        if self.run_cmd(cmd):
+            event.set_results({"restartdns": "succeed"})
+        else:
+            event.fail(message="restartdns failed")
 
     def on_getplan_action(self, event):
         """get pebble plan in pihole unit."""
