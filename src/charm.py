@@ -31,12 +31,17 @@ class PiholeCharm(CharmBase):
         self.framework.observe(self.on.set_webpassword_action, self.on_set_webpassword_action)
         self.framework.observe(self.on.restartdns_action, self.on_restartdns_action)
         self.framework.observe(self.on.getplan_action, self.on_getplan_action)
+        self._stored.set_default(is_pebble_ready=False)
 
         self.ingress = IngressRequires(self, {
             "service-hostname": self.config["external-hostname"] or self.app.name,
             "service-name": self.app.name,
             "service-port": self.config["service-port"],
         })
+
+    @property
+    def is_pebble_ready(self):
+        return self._stored.is_pebble_ready
 
     @property
     def container(self):
@@ -90,6 +95,8 @@ class PiholeCharm(CharmBase):
         self.unit.status = ActiveStatus()
 
     def on_pihole_pebble_ready(self, event):
+        logger.info("on_pihole_pebble_ready triggered")
+        self._stored.is_pebble_ready = True
         container = event.workload
         container.add_layer("pihole", self.get_pihole_pebble_layer(), combine=True)
         logger.info("pihole layer added, running autostart")
@@ -140,10 +147,16 @@ class PiholeCharm(CharmBase):
 
         ref: https://juju.is/docs/sdk/config
         """
+        if not self.is_pebble_ready:
+            logger.warning("config-changed hook triggered while pebble is not ready, defer event")
+            event.defer()
+            return
+
         layer = self.get_pihole_pebble_layer()
         try:
             services = self.container.get_plan().to_dict().get("services", {})
         except ops.pebble.ConnectionError:
+            logger.warning("config-changed hook failed to connect pebble, defer event")
             event.defer()
             return
 
