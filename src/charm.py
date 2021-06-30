@@ -170,6 +170,7 @@ class PiholeCharm(CharmBase):
         password = event.params.get("password", "")
         if not password:
             event.fail(message="password can not be empty")
+            return
 
         cmd = "/usr/local/bin/pihole -a -p {}".format(password)
         if self.run_cmd(cmd):
