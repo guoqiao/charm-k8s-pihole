@@ -159,9 +159,9 @@ Switch to the `dev` namespace to see your pods.
 
     # attach a resource to a relese if necessary
     charmcraft release pihole --revision=1 --resource=pihole-image:1 --channel=edge
-    # you can release multiple channels together
+    # you can release to multiple channels together
     charmcraft release pihole --revision=2 --resource=pihole-image:2 --channel=edge --channel=beta --channel=candidate --channel=stable
-    charmcraft status
+    charmcraft status pihole
 
 NOTE: CharmHub uses info from `stable` channel to populate charm's homepage.
 
