@@ -7,6 +7,18 @@ without installing any client-side software.
 This Charm manages Pi-hole in Kubernetes cluster, such as MicroK8s.
 Powered by Charmed Operator Framework.
 
+## Pi-hole Effect Comparison
+
+Example website: https://www.speedtest.net/
+
+Before:
+
+![before pihole](pihole-before.png)
+
+After using Pi-hole as your DNS server:
+
+![after pihole](pihole-after.png)
+
 ## Quickstart
 
     charmcraft pack
