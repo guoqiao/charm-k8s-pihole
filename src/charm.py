@@ -28,9 +28,9 @@ class PiholeCharm(CharmBase):
         #  self.framework.observe(self.on.install, self.on_install)
         self.framework.observe(self.on.pihole_pebble_ready, self.on_pihole_pebble_ready)
         self.framework.observe(self.on.config_changed, self.on_config_changed)
+        self.framework.observe(self.on.set_webpassword_action, self.on_set_webpassword_action)
         self.framework.observe(self.on.restartdns_action, self.on_restartdns_action)
         self.framework.observe(self.on.getplan_action, self.on_getplan_action)
-        self._stored.set_default(webpassword="")
 
         self.ingress = IngressRequires(self, {
             "service-hostname": self.config["external-hostname"] or self.app.name,
@@ -60,9 +60,6 @@ class PiholeCharm(CharmBase):
         return self.service and self.service.is_running()
 
     def get_pihole_pebble_layer(self):
-        env = {}
-        if self.config["webpassword"]:
-            env["WEBPASSWORD"] = self.config["webpassword"]
         # Define an initial Pebble layer configuration
         return {
             "summary": "pihole layer",
@@ -73,7 +70,7 @@ class PiholeCharm(CharmBase):
                     "summary": "pihole",
                     "command": "/s6-init",
                     "startup": "enabled",
-                    "environment": env,
+                    "environment": {},
                 }
             }
         }
@@ -101,7 +98,6 @@ class PiholeCharm(CharmBase):
         except ops.pebble.ChangeError as exc:
             # Start service "pihole" (service "pihole" was previously started)
             logger.warning(exc.err)
-        self.change_webpassword(self.config["webpassword"])
         self.unit.status = ActiveStatus()
 
     def run_cmd(self, cmd, label="cmd", env=None):
@@ -134,19 +130,6 @@ class PiholeCharm(CharmBase):
                 logger.exception("cmd failed")
                 return False
 
-    def change_webpassword(self, new_password):
-        if not new_password:
-            logger.warning("new password is empty, no change made")
-            return
-
-        if self._stored.webpassword == new_password:
-            logger.warning("new password is same as current one, no change made")
-            return
-
-        cmd = "/usr/local/bin/pihole -a -p {}".format(new_password)
-        self.run_cmd(cmd)
-        self._stored.webpassword = new_password
-
     def on_config_changed(self, event):
         """charm config changed hook.
 
@@ -168,12 +151,22 @@ class PiholeCharm(CharmBase):
             self.restart_pihole(self.container)
 
         self.ingress.update_config({"service-hostname": self.config["external-hostname"]})
-        self.change_webpassword(self.config["webpassword"])
+
+    def on_set_webpassword_action(self, event):
+        """set webpassword for pihole."""
+        password = event.params.get("password", "")
+        if not password:
+            event.fail(message="password can not be empty")
+
+        cmd = "/usr/local/bin/pihole -a -p {}".format(password)
+        if self.run_cmd(cmd):
+            event.set_results({"set-webpassword": "succeed"})
+        else:
+            event.fail(message="set webpassword failed")
 
     def on_restartdns_action(self, event):
         """restartdns in pihole."""
         cmd = "/usr/local/bin/pihole restartdns"
-        event.log("running cmd: {}".format(cmd))
         if self.run_cmd(cmd):
             event.set_results({"restartdns": "succeed"})
         else:

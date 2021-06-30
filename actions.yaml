@@ -3,6 +3,13 @@
 #
 # Learn more about actions at: https://juju.is/docs/sdk/actions
 
+set-webpassword:
+  description: set webpassword for pihole web UI
+  params:
+    password:
+      type: string
+      description: The password to set.
+
 restartdns:
   description: restart dns serveice in pihole
 
