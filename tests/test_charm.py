@@ -50,8 +50,10 @@ class TestCharm(unittest.TestCase):
         }
         # Get the pihole container from the model
         container = self.harness.model.unit.get_container("pihole")
+        self.assertFalse(self.harness.charm.is_pebble_ready)
         # Emit the PebbleReadyEvent carrying the pihole container
         self.harness.charm.on.pihole_pebble_ready.emit(container)
+        self.assertTrue(self.harness.charm.is_pebble_ready)
         # Get the plan now we've run PebbleReady
         updated_plan = self.harness.get_container_pebble_plan("pihole").to_dict()
         # Check we've got the plan we expected
