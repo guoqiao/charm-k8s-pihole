@@ -92,7 +92,7 @@ class PiholeCharm(CharmBase):
     def on_pihole_pebble_ready(self, event):
         container = event.workload
         container.add_layer("pihole", self.get_pihole_pebble_layer(), combine=True)
-        logger.info("pihole layer added")
+        logger.info("pihole layer added, running autostart")
         try:
             container.autostart()
         except ops.pebble.ChangeError as exc:
