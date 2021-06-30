@@ -28,6 +28,18 @@ After using Pi-hole as your DNS server:
     juju relate ingress pihole
     watch --color juju status --color
 
+## Webpassword
+
+For security, this charm doesn't provide default/plaintext password.
+So Pi-hole will genrate a random one and save the hashed version.
+
+To set your own webpassword, use this action:
+
+    juju run-action --wait pihole/0 set-webpassword password=<your-pass>
+
+If you lost your password, you have to set a new one.
+There is no way to retrive the old password in plaintext.
+
 ## Development
 
 Update the ingress library:
