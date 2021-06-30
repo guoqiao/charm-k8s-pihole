@@ -17,11 +17,6 @@ class TestCharm(unittest.TestCase):
         self.addCleanup(self.harness.cleanup)
         self.harness.begin()
 
-    def test_config_changed(self):
-        self.assertEqual(self.harness.charm._stored.webpassword, "")
-        self.harness.update_config({"webpassword": "foo"})
-        self.assertEqual(self.harness.charm._stored.webpassword, "foo")
-
     def test_action(self):
         # the harness doesn't (yet!) help much with actions themselves
         action_event = Mock(params={"fail": ""})
@@ -45,17 +40,11 @@ class TestCharm(unittest.TestCase):
         # Expected plan after Pebble ready with default config
         expected_plan = {
             "services": {
-                "cmd": {
-                    "override": "replace",
-                    "command": "/usr/local/bin/pihole -a -p pihole",
-                    "startup": "disabled",
-                },
                 "pihole": {
                     "override": "replace",
                     "summary": "pihole",
                     "command": "/s6-init",
                     "startup": "enabled",
-                    "environment": {"WEBPASSWORD": "pihole"},
                 }
             },
         }
