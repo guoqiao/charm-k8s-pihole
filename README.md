@@ -42,26 +42,35 @@ Build charm, deploy/upgrade:
     juju deploy ./pihole.charm pihole --resource pihole-image=pihole/pihole:latest
     juju upgrade-charm --path ./pihole.charm pihole
 
-Describe/inspect pod:
+Describe/inspect pod (juju unit):
 
     microk8s kubectl describe -n dev pod pihole-0
 
-Access charm/sidecar container:
+Show logs:
 
+    juju debug-log --include unit-pihole-0  # juju log
+    microk8s kubectl logs -f -n dev pod/pihole-0 -c pihole  # docker log
+
+Access charm/sidecar or pihole/app container:
+
+    juju ssh --container charm  pihole/0
+    juju ssh --container pihole pihole/0
+    # in microk8s env, above is equvalent to:
     microk8s kubectl exec -n dev -it pihole-0 -c charm  -- bash
-
-Access pihole pod pihole/app container:
-
     microk8s kubectl exec -n dev -it pihole-0 -c pihole -- bash
 
-Run command in container:
+Run command in containers:
 
     microk8s kubectl exec -n dev -it pihole-0 -c pihole -- /charm/bin/pebble plan
     microk8s kubectl exec -n dev -it pihole-0 -c pihole -- /charm/bin/pebble services
+    microk8s kubectl exec -n dev -it pihole-0 -c charm -- ps aux
 
-Show logs:
+The expected juju run equvalent should be:
 
-    microk8s kubectl logs -f -n dev pod/pihole-0 -c pihole
+    juju run --unit pihole/0 -- /charm/bin/pebble <cmd>
+    juju run --unit pihole/0 --operator -- ps aux
+
+However, this seems not working because of [bug 1934046](https://bugs.launchpad.net/juju/+bug/1934046)
 
 ## Access Kubernetes Dashboard
 
