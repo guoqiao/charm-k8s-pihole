@@ -149,6 +149,7 @@ At Settings -> Wi-Fi -> select a connection -> Gear Icon -> IPv4 -> DNS:
 Then ensure system is using expected DNS:
 
     sudo systemd-resolve --flush-caches
+    sudo service network-manager restart
     ip link; IF=<interface>  # e.g.: wlp2s0
     nmcli device show $IF | grep DNS  # should be the Pi-hole IP
 
